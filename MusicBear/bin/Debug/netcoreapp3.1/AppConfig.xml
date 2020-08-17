@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<appsetting>
+  <token>token there</token>
+  <prefix>-</prefix>
+  <game>type "-help" to get help</game>
+  <status value="Online Idle DoNotDisturb Invisible">Online</status>
+  <songinstatus value="Ture False">True</songinstatus>
+</appsetting>
