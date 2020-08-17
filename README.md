@@ -8,10 +8,10 @@ This Bot can send audio to different guilds at the same time.
 The folder where this app is located must include "AppConfig.xml", "Help.txt", and can include a "Playlist" folder to store playlists. 
 Before you launch this app, you should replace "token there" to your bot's token in "AppConfig.xml".
 
-A playlist must be saved in txt format, and the format of the contents should be like as follows:
-C:\Users\User\Music\example.mp3
-D:\example.flac
-...
+A playlist must be saved in txt format, and the format of the contents should be like as follows:  
+C:\Users\User\Music\example.mp3  
+D:\example.flac  
+...  
 
 # MusicBot
 Discord Music Bot
@@ -23,9 +23,9 @@ Discord Music Bot
 このアプリが置かれているフォルダーには，「AppConfig.xml」と「Help.txt」が含まれていることが必要です．また，プレイリストを保存するための「Playlist」フォルダーを含めることができます．
 このアプリを起動する前に、「AppConfig.xml」の中の「token there」をあなたのbotのトークンに置き換える必要があります．
 
-プレイリストではtxt形式で保存する必要があり，その中のフォーマットでは次のように書く必要があります：
-C:\Users\User\Music\example.mp3
-D:\example.flac
+プレイリストではtxt形式で保存する必要があり，その中のフォーマットでは次のように書く必要があります：  
+C:\Users\User\Music\example.mp3  
+D:\example.flac  
 
 # Commands :
 (the words in brackets are the abbreviation)  
