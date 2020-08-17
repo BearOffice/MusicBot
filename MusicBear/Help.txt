@@ -1,4 +1,4 @@
-﻿-help   show the help message
+-help   show the help message
 -ping   check the bot's latency
 -userinfo   show the user's info
 -setgame [game]   set the bot's game
@@ -10,7 +10,7 @@
 -join(j)   connect the bot to voice channel
 -play(p) [path]   play the provided song
 -playnext(pn) [path]   play the provided song next
--playlist(pl)   play the provided playlist's song;
+-playlist(pl)   play the provided playlist's song
 -movetonext(mvn) [position]   move this song to the top of the queue
 -nowplaying(np)   show the currently playing song
 -skip(s)   skip the current song
