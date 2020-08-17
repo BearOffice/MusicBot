@@ -181,7 +181,11 @@ namespace MusicBear.Services
                         else bar += "▬";
                     }
                     bar += $" [{current.ToString(@"mm\:ss")}/{total.ToString(@"mm\:ss")}]";
-                    channel.SendMessageAsync($"`Now Playing  {container.QueueManager.NowPlaying}`\n{bar}");
+
+                    var tagfile = TagLib.File.Create(container.QueueManager.NowPlaying);   // Get the audio file's title
+                    var title = tagfile.Tag.Title;
+
+                    channel.SendMessageAsync($"`Now Playing  {title}`\n{bar}");
                 }
             }
             else
