@@ -1,12 +1,12 @@
 # MusicBot
 A Discord Music Bot
 
-This MusicBot(MusicBear) is a discord bot coded in C# with [Discord.Net](https://github.com/discord-net/Discord.Net)
-This Bot can send audio to different guilds at the same time.
+This MusicBot(MusicBear) is a discord bot coded in C# with [Discord.Net](https://github.com/discord-net/Discord.Net)  
+This Bot can send audio to different guilds at the same time.  
 
 # Install
-The folder where this app is located must include "AppConfig.xml", "Help.txt", and can include a "Playlist" folder to store playlists. 
-Before you launch this app, you should replace "token there" to your bot's token in "AppConfig.xml".
+The folder where this app is located must include "AppConfig.xml", "Help.txt", and can include a "Playlist" folder to store playlists.   
+Before you launch this app, you should replace "token there" to your bot's token in "AppConfig.xml".  
 
 A playlist must be saved in txt format, and the format of the contents should be like as follows:  
 C:\Users\User\Music\example.mp3  
@@ -16,12 +16,12 @@ D:\example.flac
 # MusicBot
 Discord Music Bot
 
-このMusicBot（MusicBear）は，[Discord.Net](https://github.com/discord-net/Discord.Net)を使用し，C＃でコーディングされたものです．
-このBotでは複数のギルドに音声を送信できます．
+このMusicBot（MusicBear）は，[Discord.Net](https://github.com/discord-net/Discord.Net)を使用し，C＃でコーディングされたものです．  
+このBotでは複数のギルドに音声を送信できます．  
 
 # インストール
-このアプリが置かれているフォルダーには，「AppConfig.xml」と「Help.txt」が含まれていることが必要です．また，プレイリストを保存するための「Playlist」フォルダーを含めることができます．
-このアプリを起動する前に、「AppConfig.xml」の中の「token there」をあなたのbotのトークンに置き換える必要があります．
+このアプリが置かれているフォルダーには，「AppConfig.xml」と「Help.txt」が含まれていることが必要です．また，プレイリストを保存するための「Playlist」フォルダーを含めることができます．  
+このアプリを起動する前に、「AppConfig.xml」の中の「token there」をあなたのbotのトークンに置き換える必要があります．  
 
 プレイリストではtxt形式で保存する必要があり，その中のフォーマットでは次のように書く必要があります：  
 C:\Users\User\Music\example.mp3  
