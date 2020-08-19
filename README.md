@@ -30,6 +30,7 @@ D:\example.flac
 # Commands :
 (the words in brackets are the abbreviation)  
   
+<pre>
 -help    show the help message  
 -ping    check the bot's latency  
 -userinfo    show the user's info  
@@ -52,3 +53,4 @@ D:\example.flac
 -removeall(rma)    remove all songs from the queue  
 -stop(sp)    stop the current song and clear the queue  
 -leave(l)    disconnect the bot from voice channel  
+<pre>
