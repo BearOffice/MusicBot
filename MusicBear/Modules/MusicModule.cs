@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -21,19 +21,19 @@ namespace MusicBear.Modules
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("play", RunMode = RunMode.Async)]
         [Alias("p")]
-        public async Task PlayAsync(string path)
+        public async Task PlayAsync([Remainder] string path)
             => await AudioServices.AddAsync(Context.Guild, Context.Channel, path, isNext: false);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("playnext", RunMode = RunMode.Async)]
         [Alias("pn")]
-        public async Task PlayNextAsync(string path)
+        public async Task PlayNextAsync([Remainder] string path)
             => await AudioServices.AddAsync(Context.Guild, Context.Channel, path, isNext: true);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("playlist", RunMode = RunMode.Async)]
         [Alias("pl")]
-        public async Task PlaylistAsync(string playlistName)
+        public async Task PlaylistAsync([Remainder] string playlistName)
             => await AudioServices.AddAsync(Context.Guild, Context.Channel, playlistName);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
