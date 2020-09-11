@@ -14,7 +14,7 @@ namespace MusicBear.Modules
         public AudioServices AudioServices { get; set; }
 
         [Command("setgame")]
-        public async Task GameAsync(string setgame)
+        public async Task GameAsync([Remainder] string setgame)  // [Remainder] takes all arguments as one
         {
             Config.Game = setgame;
             await Context.Client.SetGameAsync(setgame);
