@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Xml.Linq;
-using System.Linq;
 using Discord;
+using ConfReaderLib;
 using MusicBear.Assistor;
 
 namespace MusicBear.Core
 {
-    static class Config
+    public static class Config
     {
         public static string Token { get; }
         public static char Prefix { get; }
@@ -20,37 +19,42 @@ namespace MusicBear.Core
         {
             try
             {
-                HelpText = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Help.txt"));
-                new Playlist();
-
-                var xdoc = XDocument.Load(Path.Combine(Environment.CurrentDirectory, "AppConfig.xml"));
-                var pairs = xdoc.Root.Elements()
-                    .Select(x => new
-                    {
-                        Key = x.Name.LocalName,
-                        Value = x.Value,
-                    });
-                var dict = pairs.ToDictionary(x => x.Key, x => x.Value);
-
-                Token = dict["token"];
-
-                if (dict["prefix"].Length == 1)
-                    Prefix = Convert.ToChar(dict["prefix"]);
+                // load help message
+                if(File.Exists("Help.txt"))
+                    HelpText = File.ReadAllText("Help.txt");
                 else
-                    throw new Exception("Prefix setting in \"AppCofig.xml\" should be only one character");
+                    HelpText = "Help message does not exist";
 
-                Game = dict["game"];
+                // load playlists
+                new Playlist();  
 
-                var songinstatus = dict["songinstatus"];
-                if (String.Compare(songinstatus, "True", ignoreCase: true) == 0)
+                // load config
+                var reader = new ConfReader("AppConfig.conf");
+
+                // token
+                Token = reader.GetValue("token");
+
+                // prefix
+                var prefix = reader.GetValue("prefix");
+                if (prefix.Length == 1)
+                    Prefix = Convert.ToChar(prefix);
+                else
+                    throw new Exception("Prefix setting in \"AppConfig.conf\" should be only one character");
+
+                // game
+                Game = reader.GetValue("game");
+
+                // songinstatus
+                var songinstatus = reader.GetValue("songinstatus");
+                if (string.Compare(songinstatus, "True", ignoreCase: true) == 0)
                     SonginStatus = true;
-                else if (String.Compare(songinstatus, "False", ignoreCase: true) == 0)
+                else if (string.Compare(songinstatus, "False", ignoreCase: true) == 0)
                     SonginStatus = false;
                 else
                     throw new Exception("SonginStatus setting in \"AppCofig.xml\" isn't correct");
 
-                var status = dict["status"];
-
+                // status
+                var status = reader.GetValue("status");
                 Status = status.ToLower() switch
                 {
                     "online" => UserStatus.Online,
@@ -58,7 +62,7 @@ namespace MusicBear.Core
                     "donotdisturb" => UserStatus.DoNotDisturb,
                     "invisible" => UserStatus.Invisible,
                     _ => throw new Exception("Status setting in \"AppCofig.xml\" isn't correct")
-                };      
+                };
             }
             catch (Exception ex)
             {

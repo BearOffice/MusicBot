@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -39,53 +39,53 @@ namespace MusicBear.Modules
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("movetonext")]
         [Alias("mvn")]
-        public Task MoveToNextAsync(int pos)
-            => AudioServices.QueueOp(Context.Guild, Context.Channel, AudioServices.OpType.MoveToNext, hasPos: true, pos);
+        public async Task MoveToNextAsync(int pos)
+            => await AudioServices.QMoveToTopAsync(Context.Guild, Context.Channel, pos);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("nowplaying")]
         [Alias("np")]
-        public Task NowPlayingAsync()
-            => AudioServices.GetNowPlaying(Context.Guild, Context.Channel);
+        public async Task NowPlayingAsync()
+            => await AudioServices.GetNowPlayingAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("skip")]
         [Alias("s")]
-        public Task SkipAsync()
-            => AudioServices.SKip(Context.Guild, Context.Channel);
+        public async Task SkipAsync()
+            => await AudioServices.SkipAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("queue")]
         [Alias("q")]
-        public Task QueueAsync()
-            => AudioServices.GetQueue(Context.Guild, Context.Channel);
+        public async Task QueueAsync()
+            => await AudioServices.GetQueueAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("shuffle")]
         [Alias("sf")]
-        public Task ShuffleAsync()
-            => AudioServices.QueueOp(Context.Guild, Context.Channel, AudioServices.OpType.Shuffle, hasPos: false);
+        public async Task ShuffleAsync()
+            => await AudioServices.QShuffleAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("remove")]
         [Alias("rm")]
-        public Task RemoveAsync(int pos)
-            => AudioServices.QueueOp(Context.Guild, Context.Channel, AudioServices.OpType.Remove, hasPos: true, pos);
+        public async Task RemoveAsync(int pos)
+            => await AudioServices.QRemoveAsync(Context.Guild, Context.Channel, pos);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("removeall")]
         [Alias("rma")]
-        public Task RemoveAllAsync()
-            => AudioServices.QueueOp(Context.Guild, Context.Channel, AudioServices.OpType.RemoveAll, hasPos: false);
+        public async Task RemoveAllAsync()
+            => await AudioServices.QRemoveAllAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
-        [Command("stop")]
+        [Command("stop", RunMode = RunMode.Async)]
         [Alias("sp")]
-        public Task StopAsync()
-            => AudioServices.Stop(Context.Guild, Context.Channel);
+        public async Task StopAsync()
+            => await AudioServices.StopAsync(Context.Guild, Context.Channel);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
-        [Command("leave")]
+        [Command("leave", RunMode = RunMode.Async)]
         [Alias("l")]
         public async Task LeaveAsync()
             => await AudioServices.LeaveAsync(Context.Guild, Context.Channel);

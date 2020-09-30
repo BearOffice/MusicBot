@@ -18,31 +18,28 @@ namespace MusicBear.Modules
         {
             Config.Game = setgame;
             await Context.Client.SetGameAsync(setgame);
-            await ReplyAsync("<Mention> __Operation succeeded__");
+            await ReplyAsync("<Mention> __Set game succeeded__");
         }
 
         [Command("setstatus")]
-        public async Task StatusAsync(string setstatus)
+        public async Task StatusAsync(string status)
         {
-            switch (setstatus.ToLower())
+            try
             {
-                case "online":
-                    await Context.Client.SetStatusAsync(UserStatus.Online);
-                    break;
-                case "idle":
-                    await Context.Client.SetStatusAsync(UserStatus.Idle);
-                    break;
-                case "donotdisturb":
-                    await Context.Client.SetStatusAsync(UserStatus.DoNotDisturb);
-                    break;
-                case "invisible":
-                    await Context.Client.SetStatusAsync(UserStatus.Invisible);
-                    break;
-                default:
-                    await ReplyAsync("<Mention> __The value is not valid__\n Only 'Online' 'Idle' 'DoNotDisturb' 'Invisible' can be set");
-                    return;
+                UserStatus userstatus = status switch
+                {
+                    "online" => UserStatus.Online,
+                    "idle" => UserStatus.Idle,
+                    "donotdisturb" => UserStatus.DoNotDisturb,
+                    "invisible" => UserStatus.Invisible,
+                    _ => throw new Exception("<Mention> __The value is not valid__\n Only 'Online' 'Idle' 'DoNotDisturb' 'Invisible' can be set"),
+                };
+                await ReplyAsync("<Mention> __Set status succeeded__");
             }
-            await ReplyAsync("<Mention> __Operation succeeded__");
+            catch(Exception ex)
+            {
+                await ReplyAsync(ex.Message);
+            }
         }
 
         [Command("help")]
@@ -87,7 +84,7 @@ namespace MusicBear.Modules
         public async Task ExitAsync()
         {
             await AudioServices.LeaveAllAsync();
-            await ReplyAsync("See you next time.");
+            await ReplyAsync("See you next time");
             await Context.Client.StopAsync();
             AppControl.Exit();
         }

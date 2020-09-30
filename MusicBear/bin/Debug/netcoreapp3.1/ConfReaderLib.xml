@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ConfReaderLib</name>
+    </assembly>
+    <members>
+        <member name="T:ConfReaderLib.BadConfException">
+            <summary>
+            BadConfException
+            </summary>
+        </member>
+        <member name="M:ConfReaderLib.BadConfException.#ctor">
+            <summary>
+            BadConfException
+            </summary>
+        </member>
+        <member name="M:ConfReaderLib.BadConfException.#ctor(System.String)">
+            <summary>
+            BadConfException
+            </summary>
+        </member>
+        <member name="M:ConfReaderLib.BadConfException.#ctor(System.String,System.Exception)">
+            <summary>
+            BadConfException
+            </summary>
+        </member>
+        <member name="T:ConfReaderLib.ConfReader">
+            <summary>
+            ConfReader
+            </summary>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Read Config File.
+            Config file's format should be like as above:
+            <para>A key = Value A  {commentout symbol} Comment</para>
+            Key and value will be separated with the first '='.
+            Blank space around '=' will be ignored.
+            <para>Key and value which include blank space is acceptable.
+            Key and value are case sensitive.
+            Key should be unique.</para>
+            </summary>
+            <param name="path"></param>
+            <param name="symbol"></param>
+            <param name="strict">
+            If ture, check the config file's format strictly.
+            Any meaningless chars won't be accepted
+            </param>
+            <exception cref="T:System.IO.FileNotFoundException"></exception>
+            <exception cref="T:ConfReaderLib.BadConfException"></exception>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.GetValue(System.String)">
+            <summary>
+            Get the value associated with the specified key.
+            </summary>
+            <param name="key"></param>
+            <returns>An element contained with the specified key.</returns>
+            <exception cref="T:ConfReaderLib.BadConfException"></exception>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.TryGetValue(System.String,System.String@)">
+            <summary>
+            Try to get the value associated with the specified key.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns>true if config contains an element with the specified key; otherwise, false.</returns>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.ChangeValue(System.String,System.String,System.Boolean)">
+            <summary>
+            Change the config. Default: Save configs to the config file.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="save">If true, update the config file immediately.</param>
+            <exception cref="T:ConfReaderLib.BadConfException"></exception>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.AddConf(System.String[],System.Boolean)">
+            <summary>
+            Add a config. Default: Save configs to the config file.
+            </summary>
+            <param name="sets">
+            Set contains key, value and comment splitted by ','. Set should be formatted as below:
+            <para>"Key A,Value A,Comment A"</para>
+            Comment is optional.
+            </param>
+            <param name="save"></param>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.SaveConf">
+            <summary>
+            Save configs to the config file immediately.
+            </summary>
+        </member>
+        <member name="M:ConfReaderLib.ConfReader.Create(System.String[],System.String,System.String)">
+            <summary>
+            Create a new conf file. If the file specified is exist, it will be overwritten.
+            </summary>
+            <param name="sets">
+            Set contains key, value and comment splitted by ','. Set should be formatted as below:
+            <para>"Key A,Value A,Comment A"</para>
+            Comment is optional.
+            </param>
+            <param name="path"></param>
+            <param name="symbol"></param>
+            <exception cref="T:ConfReaderLib.BadConfException"></exception>
+        </member>
+    </members>
+</doc>

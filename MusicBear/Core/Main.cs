@@ -23,11 +23,20 @@ namespace MusicBear.Core
             client.Log += MessageAsync;
             services.GetRequiredService<CommandService>().Log += MessageAsync;
 
-            await client.LoginAsync(TokenType.Bot, Config.Token);
-            await client.StartAsync();
+            try
+            {
+                await client.LoginAsync(TokenType.Bot, Config.Token);
+                await client.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageHandler.Service.AddMessage("Discord", ex.Message);
+                AppControl.Exit();
+            }
 
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
+            // initialize game and status
             await client.SetGameAsync(Config.Game);
             await client.SetStatusAsync(Config.Status);
 
@@ -52,8 +61,8 @@ namespace MusicBear.Core
 
         private void MessageWritter(string source, string message)
         {
-            var messagenow = String.Format("{0}  {1}", DateTime.Now.ToString("T"), source);
-            Console.WriteLine($"{messagenow.PadRight(20)}{message}");
+            var messagenow = string.Format("{0}  {1}", DateTime.Now.ToString("T"), source);
+            Console.WriteLine($"{messagenow,-20}{message}");
         }
     }
 }

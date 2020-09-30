@@ -9,7 +9,7 @@ namespace MusicBear.Assistor
         // _playlist[0] is reserved by nowplaying
         // "Real" queue start from _playlist[1]
         private readonly List<string> _playlist = new List<string>();
-        public bool IfRemaining { get => !(NowPlaying == ""); }
+        public bool IsPlaying { get => !(NowPlaying == ""); }
         public string NowPlaying
         {
             get

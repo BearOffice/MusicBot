@@ -1,4 +1,4 @@
--help   show the help message
+﻿-help   show the help message
 -ping   check the bot's latency
 -userinfo   show the user's info
 -setgame [game]   set the bot's game

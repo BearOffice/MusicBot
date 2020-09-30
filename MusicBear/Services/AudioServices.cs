@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
@@ -59,7 +58,7 @@ namespace MusicBear.Services
 
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            var remaining = queue.IfRemaining;
+            var remaining = queue.IsPlaying;
 
             if (isNext) queue.AddTo(path, 1);     // Add the song to the top of the queue
             else queue.Add(path);
@@ -85,7 +84,7 @@ namespace MusicBear.Services
 
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            var remaining = queue.IfRemaining;
+            var remaining = queue.IsPlaying;
             var ex = 0;        // Return while no file exists
 
             foreach (var path in paths)
@@ -105,7 +104,7 @@ namespace MusicBear.Services
 
             await channel.SendMessageAsync($"`Added  {playlistName}`");
 
-            if (!remaining) 
+            if (!remaining)
                 await LoopAsync(guild, channel);
         }
 
@@ -113,7 +112,7 @@ namespace MusicBear.Services
         {
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            while (queue.IfRemaining)
+            while (queue.IsPlaying)
             {
                 var tagfile = TagLib.File.Create(queue.NowPlaying);   // Get the audio file's title
                 var title = tagfile.Tag.Title;
@@ -151,25 +150,24 @@ namespace MusicBear.Services
             }
         }
 
-        public Task SKip(IGuild guild, IMessageChannel channel)
+        public async Task SkipAsync(IGuild guild, IMessageChannel channel)
         {
             if (_container.TryGetValue(guild.Id, out AudioContainer container))
             {
                 container.CancellationTokenSource.Cancel();
-                channel.SendMessageAsync($"<Mention> __Music skipped__");
+                await channel.SendMessageAsync($"<Mention> __Music skipped__");
             }
             else
             {
-                channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
+                await channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
             }
-            return Task.CompletedTask;
         }
 
-        public Task GetNowPlaying(IGuild guild, IMessageChannel channel)
+        public async Task GetNowPlayingAsync(IGuild guild, IMessageChannel channel)
         {
             if (_container.TryGetValue(guild.Id, out AudioContainer container))
             {
-                if (container.QueueManager.IfRemaining && container.ResamplerDmoStream != null)
+                if (container.QueueManager.IsPlaying && container.ResamplerDmoStream != null)
                 {
                     var current = container.ResamplerDmoStream.CurrentTime;
                     var total = container.ResamplerDmoStream.TotalTime;
@@ -185,35 +183,45 @@ namespace MusicBear.Services
                     var tagfile = TagLib.File.Create(container.QueueManager.NowPlaying);   // Get the audio file's title
                     var title = tagfile.Tag.Title;
 
-                    channel.SendMessageAsync($"`Now Playing  {title}`\n{bar}");
+                    await channel.SendMessageAsync($"`Now Playing  {title}`\n{bar}");
                 }
             }
             else
-                channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
-            return Task.CompletedTask;
+                await channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
         }
 
-        public Task GetQueue(IGuild guild, IMessageChannel channel)
+        public async Task GetQueueAsync(IGuild guild, IMessageChannel channel)
         {
             if (_container.TryGetValue(guild.Id, out AudioContainer container))
             {
                 var contents = container.QueueManager.GetRestQueue();
                 if (contents == "")
-                    channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                    await channel.SendMessageAsync($"<Mention> __Queue is empty__");
                 else
-                    channel.SendMessageAsync($">>> Music Queue\n```{contents}```");
+                    await channel.SendMessageAsync($">>> Music Queue\n```{contents}```");
             }
             else
-                channel.SendMessageAsync($"<Mention> __Queue is empty__");
-            return Task.CompletedTask;
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
         }
 
-        public Task QueueOp(IGuild guild, IMessageChannel channel, OpType opType, bool hasPos, int pos = 0)
+        public async Task QMoveToTopAsync(IGuild guild, IMessageChannel channel, int pos)
+            => await QueueOpAsync(guild, channel, OpType.MoveToNext, hasPos: true, pos: pos);
+
+        public async Task QShuffleAsync(IGuild guild, IMessageChannel channel)
+            => await QueueOpAsync(guild, channel, OpType.Shuffle, hasPos: false);
+
+        public async Task QRemoveAsync(IGuild guild, IMessageChannel channel, int pos)
+            => await QueueOpAsync(guild, channel, OpType.Remove, hasPos: true, pos: pos);
+
+        public async Task QRemoveAllAsync(IGuild guild, IMessageChannel channel)
+            => await QueueOpAsync(guild, channel, OpType.RemoveAll, hasPos: false);
+
+        private async Task QueueOpAsync(IGuild guild, IMessageChannel channel, OpType opType, bool hasPos, int pos = 0)
         {
             if (!_container.TryGetValue(guild.Id, out AudioContainer container))
             {
-                channel.SendMessageAsync($"<Mention> __Queue is empty__");
-                return Task.CompletedTask;
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                return;
             }
 
             var isSuccess = opType switch
@@ -228,18 +236,17 @@ namespace MusicBear.Services
             if (!isSuccess)
             {
                 if (hasPos)
-                    channel.SendMessageAsync($"<Mention> __Operation failed__");
+                    await channel.SendMessageAsync($"<Mention> __The operation {opType} failed__");
                 else
-                    channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                    await channel.SendMessageAsync($"<Mention> __Queue is empty__");
             }
             else
             {
-                channel.SendMessageAsync($"<Mention> __Operation succeeded__");
+                await channel.SendMessageAsync($"<Mention> __{opType} succeeded__");
             }
-            return Task.CompletedTask;
         }
 
-        public enum OpType
+        private enum OpType
         {
             MoveToNext,
             Shuffle,
@@ -247,19 +254,18 @@ namespace MusicBear.Services
             RemoveAll,
         }
 
-        public Task Stop(IGuild guild, IMessageChannel channel)
+        public async Task StopAsync(IGuild guild, IMessageChannel channel)
         {
             if (_container.TryGetValue(guild.Id, out AudioContainer container))
             {
                 container.CancellationTokenSource.Cancel();
                 container.QueueManager.DeleteAll();
-                channel.SendMessageAsync($"<Mention> __Music stopped__");
+                await channel.SendMessageAsync($"<Mention> __Music stopped__");
             }
             else
             {
-                channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
+                await channel.SendMessageAsync($"<Mention> __Nothing is playing now__");
             }
-            return Task.CompletedTask;
         }
 
         public async Task LeaveAsync(IGuild guild, IMessageChannel channel)
@@ -282,5 +288,3 @@ namespace MusicBear.Services
         }
     }
 }
-
-
