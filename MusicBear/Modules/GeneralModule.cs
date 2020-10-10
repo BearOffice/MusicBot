@@ -26,7 +26,7 @@ namespace MusicBear.Modules
         {
             try
             {
-                UserStatus userstatus = status switch
+                UserStatus userstatus = status.ToLower() switch
                 {
                     "online" => UserStatus.Online,
                     "idle" => UserStatus.Idle,
@@ -34,6 +34,7 @@ namespace MusicBear.Modules
                     "invisible" => UserStatus.Invisible,
                     _ => throw new Exception("<Mention> __The value is not valid__\n Only 'Online' 'Idle' 'DoNotDisturb' 'Invisible' can be set"),
                 };
+                await Context.Client.SetStatusAsync(userstatus);
                 await ReplyAsync("<Mention> __Set status succeeded__");
             }
             catch(Exception ex)
