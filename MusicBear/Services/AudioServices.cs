@@ -31,7 +31,7 @@ namespace MusicBear.Services
                 return;
             }
             var guildId = voiceChannel.Guild.Id;
-            if (_container.TryGetValue(guildId, out _)) { return; }
+            if (_container.TryGetValue(guildId, out _)) return;
 
             var Container = new AudioContainer
             {
@@ -45,7 +45,7 @@ namespace MusicBear.Services
 
         public async Task AddAsync(IGuild guild, IMessageChannel channel, string path, bool isNext)  // Add single song
         {
-            if (!_container.TryGetValue(guild.Id, out _))
+            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
             {
                 await channel.SendMessageAsync($"<Mention> __Bot has not joined to audio channel yet__\nUse command {Config.Prefix}join first");
                 return;
@@ -56,14 +56,12 @@ namespace MusicBear.Services
                 return;
             }
 
-            _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            var remaining = queue.IsPlaying;
 
             if (isNext) queue.AddTo(path, 1);     // Add the song to the top of the queue
             else queue.Add(path);
 
-            if (!remaining)
+            if (!queue.IsPlaying)
                 await LoopAsync(guild, channel);
             else
                 await channel.SendMessageAsync($"`Added  {path}`");
@@ -71,7 +69,7 @@ namespace MusicBear.Services
 
         public async Task AddAsync(IGuild guild, IMessageChannel channel, string playlistName)   // Add Playlist
         {
-            if (!_container.TryGetValue(guild.Id, out _))
+            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
             {
                 await channel.SendMessageAsync($"<Mention> __Bot has not joined to audio channel yet__\nUse command {Config.Prefix}join first");
                 return;
@@ -82,9 +80,7 @@ namespace MusicBear.Services
                 return;
             }
 
-            _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            var remaining = queue.IsPlaying;
             var ex = 0;        // Return while no file exists
 
             foreach (var path in paths)
@@ -94,17 +90,17 @@ namespace MusicBear.Services
             }
             if (ex == paths.Count)
             {
-                await channel.SendMessageAsync($"<Exception> __Cannot find the files specified__");
+                await channel.SendMessageAsync($"<Exception> __Cannot find the music files specified__");
                 return;
             }
             else if (ex > 0)
             {
-                await channel.SendMessageAsync($"<Mention> __Some files have been skipped because these files cannot be specified__");
+                await channel.SendMessageAsync($"<Mention> __{ex} files have been skipped because these music files cannot be specified__");
             }
 
             await channel.SendMessageAsync($"`Added  {playlistName}`");
 
-            if (!remaining)
+            if (!queue.IsPlaying)
                 await LoopAsync(guild, channel);
         }
 
@@ -114,13 +110,11 @@ namespace MusicBear.Services
             var queue = container.QueueManager;
             while (queue.IsPlaying)
             {
-                var tagfile = TagLib.File.Create(queue.NowPlaying);   // Get the audio file's title
-                var title = tagfile.Tag.Title;
-                await channel.SendMessageAsync($"`Now playing  {title}`");
+                await channel.SendMessageAsync($"`Now playing  {queue.NowPlaying}`");
                 if (Config.SonginStatus)
-                    if (_container.Count == 1) await _discord.SetGameAsync(title); // Prevent collisions when the bot connects to more than one voice channel
+                    if (_container.Count == 1) await _discord.SetGameAsync(queue.NowPlaying); // Prevent collisions when the bot connects to more than one voice channel
 
-                await SendAsync(guild, queue.NowPlaying);
+                await SendAsync(guild, queue.NowPlayingPath);
 
                 Thread.Sleep(2000);
                 queue.UpdatePlaying();
@@ -180,10 +174,7 @@ namespace MusicBear.Services
                     }
                     bar += $" [{current.ToString(@"mm\:ss")}/{total.ToString(@"mm\:ss")}]";
 
-                    var tagfile = TagLib.File.Create(container.QueueManager.NowPlaying);   // Get the audio file's title
-                    var title = tagfile.Tag.Title;
-
-                    await channel.SendMessageAsync($"`Now Playing  {title}`\n{bar}");
+                    await channel.SendMessageAsync($"`Now Playing  {container.QueueManager.NowPlaying}`\n{bar}");
                 }
             }
             else

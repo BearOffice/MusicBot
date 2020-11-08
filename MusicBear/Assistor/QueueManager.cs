@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using TagLib.WavPack;
 
 namespace MusicBear.Assistor
 {
@@ -9,8 +11,8 @@ namespace MusicBear.Assistor
         // _playlist[0] is reserved by nowplaying
         // "Real" queue start from _playlist[1]
         private readonly List<string> _playlist = new List<string>();
-        public bool IsPlaying { get => !(NowPlaying == ""); }
-        public string NowPlaying
+        public bool IsPlaying { get => !(NowPlayingPath == ""); }
+        public string NowPlayingPath
         {
             get
             {
@@ -18,6 +20,16 @@ namespace MusicBear.Assistor
                     return "";
                 else
                     return _playlist[0];
+            }
+        }
+        public string NowPlaying
+        {
+            get
+            {
+                if (_playlist.Count == 0)
+                    return "";
+                else
+                    return GetTitle(_playlist[0]);
             }
         }
         public int RestNumber
@@ -34,14 +46,14 @@ namespace MusicBear.Assistor
 
         public bool AddTo(string name, int pos)
         {
-            if (!IsValid(pos)) { return false; }
+            if (!IsValid(pos)) return false;
             _playlist.Insert(pos, name);
             return true;
         }
 
         public bool MoveToTop(int pos)
         {
-            if (!IsValid(pos)) { return false; }
+            if (!IsValid(pos)) return false;
             var moveitem = _playlist[pos];
             _playlist.RemoveAt(pos);
             _playlist.Insert(1, moveitem);
@@ -50,7 +62,7 @@ namespace MusicBear.Assistor
 
         public bool Shuffle()
         {
-            if (!IsValid()) { return false; }
+            if (!IsValid()) return false;
             for (int i = 1; i < _playlist.Count; i++)  //Linq cannot be used because _playlist is readonly
             {
                 string temp = _playlist[i];
@@ -63,14 +75,14 @@ namespace MusicBear.Assistor
 
         public bool Delete(int pos)
         {
-            if (!IsValid(pos)) { return false; }
+            if (!IsValid(pos)) return false;
             _playlist.RemoveAt(pos);
             return true;
         }
 
         public bool DeleteAll()
         {
-            if (!IsValid()) { return false; }
+            if (!IsValid()) return false;
             var nowplaying = _playlist[0];
             _playlist.Clear();
             _playlist.Add(nowplaying);
@@ -80,9 +92,7 @@ namespace MusicBear.Assistor
         public void UpdatePlaying()
         {
             if (_playlist.Count != 0)
-            {
                 _playlist.RemoveAt(0);
-            }
         }
 
         public string GetRestQueue()
@@ -92,9 +102,7 @@ namespace MusicBear.Assistor
             {
                 for (int i = 1; i < _playlist.Count; i++)
                 {
-                    var tagfile = TagLib.File.Create(_playlist[i]);   // Get audio file's title
-                    var title = tagfile.Tag.Title;
-                    queue += $"{i}.".PadRight(4) + $"{title}\n";
+                    queue += $"{i}.".PadRight(4) + $"{GetTitle(_playlist[i])}\n";
                     if (i == 20)
                     {
                         queue += "...\n";
@@ -107,14 +115,23 @@ namespace MusicBear.Assistor
 
         private bool IsValid(int pos)
         {
-            if (1 <= pos && pos < _playlist.Count) { return true; }
+            if (1 <= pos && pos < _playlist.Count) return true;
             return false;
         }
 
         private bool IsValid()
         {
-            if (_playlist.Count > 1) { return true; }
+            if (_playlist.Count > 1) return true;
             return false;
+        }
+
+        private string GetTitle(string path)
+        {
+            var tagfile = TagLib.File.Create(path);   // Get audio file's title
+            var title = tagfile.Tag.Title;
+            if (title == "" || title == null)
+                title = Path.GetFileName(path);
+            return title;
         }
     }
 }
