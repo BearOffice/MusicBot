@@ -58,9 +58,9 @@ namespace MusicBear.Modules
             await ReplyAsync(user.ToString());
         }
 
-        [Command("showplaylists")]
-        [Alias("spl")]
-        public async Task ShowPlaylistsAsync()
+        [Command("playlist")]
+        [Alias("pl")]
+        public async Task PlaylistAsync()
         {
             if (Playlist.List.Count == 0)
                 await ReplyAsync("<Mention> __Playlist is empty__");
@@ -69,14 +69,6 @@ namespace MusicBear.Modules
                 var pl = String.Join(", ", Playlist.List.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
                 await ReplyAsync($">>> Playlists\n```{pl}```");
             }
-        }
-
-        [Command("updateplaylists")]
-        [Alias("upl")]
-        public async Task UpdatePlaylistsAsync()
-        {
-            new Playlist();
-            await ReplyAsync("<Mention> __Playlists updated__");
         }
 
         [RequireOwner]

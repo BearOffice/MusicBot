@@ -21,24 +21,20 @@ namespace MusicBear.Modules
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("play", RunMode = RunMode.Async)]
         [Alias("p")]
-        public async Task PlayAsync([Remainder] string path)
-            => await AudioServices.AddAsync(Context.Guild, Context.Channel, path, isNext: false);
+        public async Task PlayAsync([Remainder] string item)
+            => await AudioServices.AddAsync(Context.Guild, (Context.User as IGuildUser)?.VoiceChannel,
+                Context.Channel, item, isNext: false);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("playnext", RunMode = RunMode.Async)]
         [Alias("pn")]
-        public async Task PlayNextAsync([Remainder] string path)
-            => await AudioServices.AddAsync(Context.Guild, Context.Channel, path, isNext: true);
-
-        [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
-        [Command("playlist", RunMode = RunMode.Async)]
-        [Alias("pl")]
-        public async Task PlaylistAsync([Remainder] string playlistName)
-            => await AudioServices.AddAsync(Context.Guild, Context.Channel, playlistName);
+        public async Task PlayNextAsync([Remainder] string item)
+            => await AudioServices.AddAsync(Context.Guild, (Context.User as IGuildUser)?.VoiceChannel,
+                Context.Channel, item, isNext: true);
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("movetonext")]
-        [Alias("mvn")]
+        [Alias("mn")]
         public async Task MoveToNextAsync(int pos)
             => await AudioServices.QMoveToTopAsync(Context.Guild, Context.Channel, pos);
 
@@ -50,7 +46,6 @@ namespace MusicBear.Modules
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("skip")]
-        [Alias("s")]
         public async Task SkipAsync()
             => await AudioServices.SkipAsync(Context.Guild, Context.Channel);
 
@@ -80,7 +75,6 @@ namespace MusicBear.Modules
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("stop", RunMode = RunMode.Async)]
-        [Alias("sp")]
         public async Task StopAsync()
             => await AudioServices.StopAsync(Context.Guild, Context.Channel);
 

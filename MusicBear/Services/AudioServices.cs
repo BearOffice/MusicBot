@@ -9,6 +9,7 @@ using Discord.WebSocket;
 using NAudio.Wave;
 using MusicBear.Core;
 using MusicBear.Assistor;
+using System;
 
 namespace MusicBear.Services
 {
@@ -23,15 +24,15 @@ namespace MusicBear.Services
             _discord = discord;
         }
 
-        public async Task JoinAsync(IVoiceChannel voiceChannel, IMessageChannel channel)
+        public async Task<bool> JoinAsync(IVoiceChannel voiceChannel, IMessageChannel channel)
         {
             if (voiceChannel == null)
             {
                 await channel.SendMessageAsync("<Mention> __User must be in a voice channel__");
-                return;
+                return false;
             }
             var guildId = voiceChannel.Guild.Id;
-            if (_container.TryGetValue(guildId, out _)) return;
+            if (_container.TryGetValue(guildId, out _)) return false;
 
             var Container = new AudioContainer
             {
@@ -41,83 +42,104 @@ namespace MusicBear.Services
             };
             Container.AudioOutStream = Container.AudioClient.CreatePCMStream(AudioApplication.Music, bitrate: 128000);
             _container.TryAdd(guildId, Container);
+
+            return true;
         }
 
-        public async Task AddAsync(IGuild guild, IMessageChannel channel, string path, bool isNext)  // Add single song
+        public async Task AddAsync(IGuild guild, IVoiceChannel voiceChannel, IMessageChannel channel, string item, bool isNext)
         {
-            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (!_container.TryGetValue(guild.Id, out _))   // may out null
             {
-                await channel.SendMessageAsync($"<Mention> __Bot has not joined to audio channel yet__\nUse command {Config.Prefix}join first");
-                return;
-            }
-            if (!File.Exists(path))
-            {
-                await channel.SendMessageAsync($"<Exception> __Cannot find the file specified__");
-                return;
+                var result = await JoinAsync(voiceChannel, channel);
+                if (!result) return;
             }
 
-            var queue = container.QueueManager;
+            _container.TryGetValue(guild.Id, out AudioContainer container);
+            var isIdle = !container.QueueManager.IsPlaying;
 
-            if (isNext) queue.AddTo(path, 1);     // Add the song to the top of the queue
-            else queue.Add(path);
-
-            if (!queue.IsPlaying)
-                await LoopAsync(guild, channel);
+            new Playlist();  // Update the playlist
+            if (Playlist.List.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
+                await AddListAsync(guild, channel, item, isNext);
+            else if (File.Exists(item))
+                await AddSingleAsync(guild, channel, item, isNext);
             else
-                await channel.SendMessageAsync($"`Added  {path}`");
+                await channel.SendMessageAsync($"<Exception> __Cannot find the music file or playlist specified__" +
+                    $"Check if the music file's path is correct " +
+                    $"or use command {Config.Prefix}playlist to confirm the avaliable playlists");
+
+            if (isIdle)
+                await SendingLoopAsync(guild, channel);
         }
 
-        public async Task AddAsync(IGuild guild, IMessageChannel channel, string playlistName)   // Add Playlist
+        // Add single song
+        private async Task AddSingleAsync(IGuild guild, IMessageChannel channel, string path, bool isNext)
         {
-            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
-            {
-                await channel.SendMessageAsync($"<Mention> __Bot has not joined to audio channel yet__\nUse command {Config.Prefix}join first");
-                return;
-            }
-            if (!Playlist.List.TryGetValue($"{playlistName}.txt", out List<string> paths))   // Add file extension ".txt"
-            {
-                await channel.SendMessageAsync($"<Exception> __Cannot find the playlist specified__\nUse command {Config.Prefix}showplaylists to confirm the avaliable playlists");
-                return;
-            }
-
+            _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
-            var ex = 0;        // Return while no file exists
 
-            foreach (var path in paths)
+            if (isNext)
+                queue.AddTo(path, 0);     // Add the song to the top of the queue
+            else
+                queue.Add(path);
+
+            await channel.SendMessageAsync($"`{path} added`");
+        }
+
+        // Add Playlist
+        private async Task AddListAsync(IGuild guild, IMessageChannel channel, string playlistName, bool isNext)
+        {
+            Playlist.List.TryGetValue($"{playlistName}.txt", out List<string> paths);
+            _container.TryGetValue(guild.Id, out AudioContainer container);
+            var queue = container.QueueManager;
+            var ex = 0;        // Count the files' amount that do not exist
+
+            if (isNext)
             {
-                if (File.Exists(path)) queue.Add(path);
-                else ex++;
+                paths.Reverse();
+                paths.ForEach(path =>
+                {
+                    if (File.Exists(path)) queue.AddTo(path, 0);
+                    else ex++;
+                });
             }
+            else
+            {
+                paths.ForEach(path =>
+                {
+                    if (File.Exists(path)) queue.Add(path);
+                    else ex++;
+                });
+            }
+
             if (ex == paths.Count)
             {
-                await channel.SendMessageAsync($"<Exception> __Cannot find the music files specified__");
+                await channel.SendMessageAsync($"<Exception> __Cannot find any music files specified\n" +
+                    $"Check out the music files paths__");
                 return;
             }
             else if (ex > 0)
             {
-                await channel.SendMessageAsync($"<Mention> __{ex} files have been skipped because these music files cannot be specified__");
+                await channel.SendMessageAsync($"<Mention> __Some songs({ex}) have been skipped " +
+                    $"because these music files cannot be specified__");
             }
 
-            await channel.SendMessageAsync($"`Added  {playlistName}`");
-
-            if (!queue.IsPlaying)
-                await LoopAsync(guild, channel);
+            await channel.SendMessageAsync($"`{playlistName} added`");
         }
 
-        private async Task LoopAsync(IGuild guild, IMessageChannel channel)
+        private async Task SendingLoopAsync(IGuild guild, IMessageChannel channel)
         {
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
             while (queue.IsPlaying)
             {
                 await channel.SendMessageAsync($"`Now playing  {queue.NowPlaying}`");
-                if (Config.SonginStatus)
-                    if (_container.Count == 1) await _discord.SetGameAsync(queue.NowPlaying); // Prevent collisions when the bot connects to more than one voice channel
+                if (Config.SonginStatus && _container.Count == 1)  // Prevent collisions when the bot connects to more than one voice channel
+                    await _discord.SetGameAsync(queue.NowPlaying);
 
                 await SendAsync(guild, queue.NowPlayingPath);
 
                 Thread.Sleep(2000);
-                queue.UpdatePlaying();
+                queue.PlayNext();
             }
             await _discord.SetGameAsync(Config.Game);
         }

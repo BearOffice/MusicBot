@@ -2,52 +2,36 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TagLib.WavPack;
 
 namespace MusicBear.Assistor
 {
     public class QueueManager
     {
-        // _playlist[0] is reserved by nowplaying
-        // "Real" queue start from _playlist[1]
-        private readonly List<string> _playlist = new List<string>();
+        private readonly List<string> _playlist = new List<string>();  // Contains music files' paths
         public bool IsPlaying { get => !(NowPlayingPath == ""); }
-        public string NowPlayingPath
+        public int RemainingNumber { get => _playlist.Count(); }
+        public string NowPlayingPath { get; private set; } = "";
+        public string NowPlaying { get; private set; } = "";
+        public bool HasRest
         {
             get
             {
-                if (_playlist.Count == 0)
-                    return "";
-                else
-                    return _playlist[0];
-            }
-        }
-        public string NowPlaying
-        {
-            get
-            {
-                if (_playlist.Count == 0)
-                    return "";
-                else
-                    return GetTitle(_playlist[0]);
-            }
-        }
-        public int RestNumber
-        {
-            get
-            {
-                if (IsValid())
-                    return _playlist.Count() - 1;
-                return 0;
+                if (_playlist.Count > 0) return true;
+                return false;
             }
         }
 
-        public void Add(string name) => _playlist.Add(name);
+        public void Add(string name)
+        {
+            _playlist.Add(name);
+            RefreshQueue();
+        }
 
         public bool AddTo(string name, int pos)
         {
             if (!IsValid(pos)) return false;
             _playlist.Insert(pos, name);
+            RefreshQueue();
             return true;
         }
 
@@ -56,17 +40,17 @@ namespace MusicBear.Assistor
             if (!IsValid(pos)) return false;
             var moveitem = _playlist[pos];
             _playlist.RemoveAt(pos);
-            _playlist.Insert(1, moveitem);
+            _playlist.Insert(0, moveitem);
             return true;
         }
 
         public bool Shuffle()
         {
-            if (!IsValid()) return false;
-            for (int i = 1; i < _playlist.Count; i++)  //Linq cannot be used because _playlist is readonly
+            if (!HasRest) return false;
+            for (int i = 0; i < _playlist.Count; i++)  //Linq cannot be used because _playlist is readonly
             {
                 string temp = _playlist[i];
-                int random = new Random().Next(1, _playlist.Count);
+                int random = new Random().Next(0, _playlist.Count);
                 _playlist[i] = _playlist[random];
                 _playlist[random] = temp;
             }
@@ -82,28 +66,44 @@ namespace MusicBear.Assistor
 
         public bool DeleteAll()
         {
-            if (!IsValid()) return false;
-            var nowplaying = _playlist[0];
+            if (!HasRest) return false;
             _playlist.Clear();
-            _playlist.Add(nowplaying);
             return true;
         }
 
-        public void UpdatePlaying()
+        private void RefreshQueue()
         {
-            if (_playlist.Count != 0)
+            if (HasRest && NowPlayingPath == "")
+            {
+                PlayNext();
+            }
+        }
+
+        public void PlayNext()
+        {
+            if (HasRest)
+            {
+                var playitem = _playlist[0];
+                NowPlayingPath = playitem;
+                NowPlaying = GetTitle(playitem);
                 _playlist.RemoveAt(0);
+            }
+            else if (NowPlayingPath != "")
+            {
+                NowPlayingPath = "";
+                NowPlaying = "";
+            }
         }
 
         public string GetRestQueue()
         {
             var queue = "";
-            if (IsValid())
+            if (HasRest)
             {
-                for (int i = 1; i < _playlist.Count; i++)
+                for (int i = 0; i < _playlist.Count; i++)
                 {
                     queue += $"{i}.".PadRight(4) + $"{GetTitle(_playlist[i])}\n";
-                    if (i == 20)
+                    if (i == 19)  // 20 elements totally
                     {
                         queue += "...\n";
                         break;
@@ -115,13 +115,7 @@ namespace MusicBear.Assistor
 
         private bool IsValid(int pos)
         {
-            if (1 <= pos && pos < _playlist.Count) return true;
-            return false;
-        }
-
-        private bool IsValid()
-        {
-            if (_playlist.Count > 1) return true;
+            if (0 <= pos && pos < _playlist.Count) return true;
             return false;
         }
 

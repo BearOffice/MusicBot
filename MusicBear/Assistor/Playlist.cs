@@ -7,12 +7,7 @@ namespace MusicBear.Assistor
 {
     public class Playlist
     {
-        public static Dictionary<string, List<string>> List { get; }
-
-        static Playlist()
-        {
-            List = new Dictionary<string, List<string>>();
-        }
+        public static Dictionary<string, List<string>> List { get; } = new Dictionary<string, List<string>>();
 
         public Playlist()
         {
