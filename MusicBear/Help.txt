@@ -10,10 +10,10 @@
 -play(p) [path/playlist]   play the provided song or playlist
 -playnext(pn) [path/playlist]   play the provided song or playlist next
 -movetonext(mn) [position]   move this song to the top of the queue
--nowplaying(np)   show the currently playing song
+-nowplaying(np)   show the current song
 -skip(skip)   skip the current song
 -queue(q)   show the current queue
--shuffle(sf)   shuffle songs that have added
+-shuffle(sf)   shuffle songs in the queue
 -remove(rm) [position]   remove a song from the queue
 -removeall(rma)   remove all songs from the queue
 -stop(stop)   stop the current song and clear the queue   

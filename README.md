@@ -36,21 +36,19 @@ D:\example.flac
 -userinfo    show the user's info  
 -setgame [game]    set the bot's game  
 -setstatus [status]    set the bot's status  
--showplaylists(spl)    shows the available playlists  
--updateplaylists(upl)    update the playlists  
--shutdown(exit/disconnect)    shut the bot down  
+-playlist(pl)   show the available playlists  
+-shutdown(exit/disconnect)    shut down the bot  
 
 -join(j)    connect the bot to voice channel  
--play(p) [path]    play the provided song  
--playnext(pn) [path]    play the provided song next  
--playlist(pl)    play the provided playlist's song  
+-play(p) [path/playlist]   play the provided song or playlist  
+-playnext(pn) [path/playlist]   play the provided song or playlist next  
 -movetonext(mvn) [position]    move this song to the top of the queue  
--nowplaying(np)    show the currently playing song  
--skip(s)    skip the current song  
+-nowplaying(np)    show the current song  
+-skip(skip)    skip the current song  
 -queue(q)    show the current queue  
--shuffle(sf)    shuffle songs that have added  
+-shuffle(sf)    shuffle songs in the queue  
 -remove(rm) [position]    remove a song from the queue  
 -removeall(rma)    remove all songs from the queue  
--stop(sp)    stop the current song and clear the queue  
+-stop(stop)    stop the current song and clear the queue  
 -leave(l)    disconnect the bot from voice channel  
 <pre>
