@@ -62,6 +62,7 @@ namespace MusicBear.Modules
         [Alias("pl")]
         public async Task PlaylistAsync()
         {
+            new Playlist();  // Update playlist
             if (Playlist.List.Count == 0)
                 await ReplyAsync("<Mention> __Playlist is empty__");
             else
