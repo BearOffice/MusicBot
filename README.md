@@ -42,7 +42,7 @@ D:\example.flac
 -join(j)    connect the bot to voice channel  
 -play(p) [path/playlist]   play the provided song or playlist  
 -playnext(pn) [path/playlist]   play the provided song or playlist next  
--movetonext(mvn) [position]    move this song to the top of the queue  
+-movetonext(mn) [position]    move this song to the top of the queue  
 -nowplaying(np)    show the current song  
 -skip(skip)    skip the current song  
 -queue(q)    show the current queue  
