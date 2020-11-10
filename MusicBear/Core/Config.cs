@@ -25,9 +25,6 @@ namespace MusicBear.Core
                 else
                     HelpText = "Help message does not exist";
 
-                // load playlists
-                new Playlist();  
-
                 // load config
                 var reader = new ConfReader("AppConfig.conf");
 

@@ -62,12 +62,11 @@ namespace MusicBear.Modules
         [Alias("pl")]
         public async Task PlaylistAsync()
         {
-            new Playlist();  // Update playlist
-            if (Playlist.List.Count == 0)
+            if (PlaylistInfo.List.Count == 0)
                 await ReplyAsync("<Mention> __Playlist is empty__");
             else
             {
-                var pl = String.Join(", ", Playlist.List.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
+                var pl = String.Join(", ", PlaylistInfo.List.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
                 await ReplyAsync($">>> Playlists\n```{pl}```");
             }
         }

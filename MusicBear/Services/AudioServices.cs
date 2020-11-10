@@ -57,8 +57,7 @@ namespace MusicBear.Services
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var isIdle = !container.QueueManager.IsPlaying;
 
-            new Playlist();  // Update the playlist
-            if (Playlist.List.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
+            if (PlaylistInfo.List.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
                 await AddListAsync(guild, channel, item, isNext);
             else if (File.Exists(item))
                 await AddSingleAsync(guild, channel, item, isNext);
@@ -88,7 +87,7 @@ namespace MusicBear.Services
         // Add Playlist
         private async Task AddListAsync(IGuild guild, IMessageChannel channel, string playlistName, bool isNext)
         {
-            Playlist.List.TryGetValue($"{playlistName}.txt", out List<string> paths);
+            PlaylistInfo.List.TryGetValue($"{playlistName}.txt", out List<string> paths);
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
             var ex = 0;        // Count the files' amount that do not exist
