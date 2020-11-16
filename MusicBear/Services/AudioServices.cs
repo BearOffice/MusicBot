@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
@@ -9,7 +10,6 @@ using Discord.WebSocket;
 using NAudio.Wave;
 using MusicBear.Core;
 using MusicBear.Assistor;
-using System;
 
 namespace MusicBear.Services
 {
@@ -50,24 +50,26 @@ namespace MusicBear.Services
         {
             if (!_container.TryGetValue(guild.Id, out _))   // may out null
             {
-                var result = await JoinAsync(voiceChannel, channel);
-                if (!result) return;
+                if (!await JoinAsync(voiceChannel, channel)) return;
             }
 
             _container.TryGetValue(guild.Id, out AudioContainer container);
-            var isIdle = !container.QueueManager.IsPlaying;
 
             if (PlaylistInfo.List.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
                 await AddListAsync(guild, channel, item, isNext);
             else if (File.Exists(item))
                 await AddSingleAsync(guild, channel, item, isNext);
             else
-                await channel.SendMessageAsync($"<Exception> __Cannot find the music file or playlist specified__" +
+                await channel.SendMessageAsync($"<Exception> __Cannot find the music file or playlist specified__\n" +
                     $"Check if the music file's path is correct " +
                     $"or use command {Config.Prefix}playlist to confirm the avaliable playlists");
 
-            if (isIdle)
+            var queue = container.QueueManager;
+            if (!queue.IsPlaying)
+            {
+                queue.StartPlay();
                 await SendingLoopAsync(guild, channel);
+            }
         }
 
         // Add single song
@@ -112,8 +114,8 @@ namespace MusicBear.Services
 
             if (ex == paths.Count)
             {
-                await channel.SendMessageAsync($"<Exception> __Cannot find any music files specified\n" +
-                    $"Check out the music files paths__");
+                await channel.SendMessageAsync($"<Exception> __Cannot find any music files specified__\n" +
+                    $"Check out the music files paths");
                 return;
             }
             else if (ex > 0)

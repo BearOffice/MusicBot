@@ -24,14 +24,12 @@ namespace MusicBear.Assistor
         public void Add(string name)
         {
             _playlist.Add(name);
-            RefreshQueue();
         }
 
         public bool AddTo(string name, int pos)
         {
             if (!IsValid(pos)) return false;
             _playlist.Insert(pos, name);
-            RefreshQueue();
             return true;
         }
 
@@ -71,14 +69,6 @@ namespace MusicBear.Assistor
             return true;
         }
 
-        private void RefreshQueue()
-        {
-            if (HasRest && NowPlayingPath == "")
-            {
-                PlayNext();
-            }
-        }
-
         public void PlayNext()
         {
             if (HasRest)
@@ -93,6 +83,12 @@ namespace MusicBear.Assistor
                 NowPlayingPath = "";
                 NowPlaying = "";
             }
+        }
+
+        public void StartPlay()
+        {
+            if (NowPlayingPath == "")
+                PlayNext();
         }
 
         public string GetRestQueue()

@@ -2,7 +2,6 @@
 using System.IO;
 using Discord;
 using ConfReaderLib;
-using MusicBear.Assistor;
 
 namespace MusicBear.Core
 {
