@@ -1,8 +1,8 @@
 # MusicBot
 A Discord Music Bot
 
-This MusicBot(MusicBear) is a discord bot coded in C# with [Discord.Net](https://github.com/discord-net/Discord.Net)  
-(Using library [ConfReaderLib](https://github.com/MisakiBear/ConfReaderLib))
+This MusicBot(MusicBear) is a discord bot coded in C# with [Discord.Net](https://github.com/discord-net/Discord.Net)
+(Using library [ConfReaderLib](https://github.com/MisakiBear/ConfReaderLib))  
 This Bot can send audio to different guilds at the same time.  
 
 # Install
@@ -17,8 +17,8 @@ D:\example.flac
 # MusicBot
 Discord Music Bot
 
-このMusicBot（MusicBear）は，[Discord.Net](https://github.com/discord-net/Discord.Net)を使用し，C＃でコーディングされたものです．  
-([ConfReaderLib](https://github.com/MisakiBear/ConfReaderLib)を使用)
+このMusicBot（MusicBear）は，[Discord.Net](https://github.com/discord-net/Discord.Net)を使用し，C＃でコーディングされたものです．
+([ConfReaderLib](https://github.com/MisakiBear/ConfReaderLib)を使用)  
 このBotでは複数のギルドに音声を送信できます．  
 
 # インストール
