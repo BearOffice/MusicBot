@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Discord;
-using ConfReaderLib;
+using ConfigReadingLib;
 
 namespace MusicBear.Core
 {
@@ -25,7 +25,7 @@ namespace MusicBear.Core
                     HelpText = "Help message does not exist";
 
                 // load config
-                var reader = new ConfReader("AppConfig.conf");
+                var reader = new ConfigReader("AppConfig.conf");
 
                 // token
                 Token = reader.GetValue("token");

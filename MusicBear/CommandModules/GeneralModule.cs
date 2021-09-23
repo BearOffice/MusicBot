@@ -5,9 +5,9 @@ using Discord;
 using Discord.Commands;
 using MusicBear.Services;
 using MusicBear.Core;
-using MusicBear.Assistor;
+using MusicBear.AudioAssistant;
 
-namespace MusicBear.Modules
+namespace MusicBear.CommandModules
 {
     public class GeneralModule : ModuleBase<SocketCommandContext>
     {
@@ -62,11 +62,11 @@ namespace MusicBear.Modules
         [Alias("pl")]
         public async Task PlaylistAsync()
         {
-            if (PlaylistInfo.List.Count == 0)
+            if (Playlist.Info.Count == 0)
                 await ReplyAsync("<Mention> __Playlist is empty__");
             else
             {
-                var pl = String.Join(", ", PlaylistInfo.List.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
+                var pl = String.Join(", ", Playlist.Info.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
                 await ReplyAsync($">>> Playlists\n```{pl}```");
             }
         }

@@ -4,9 +4,9 @@ using MusicBear.Core;
 
 namespace MusicBear
 {
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args) => 
-            await new Main().MainAsync();
+        public static async Task Main(string[] args) => 
+            await new EntryPoint().EntryAsync();
     }
 }

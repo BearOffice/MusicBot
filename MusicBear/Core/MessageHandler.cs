@@ -5,13 +5,8 @@ namespace MusicBear.Core
 {
     public class MessageHandler
     {
-        public static MessageHandler Service { get; }
+        public static MessageHandler Service { get; } = new MessageHandler();
         public event Func<MessageEventArgs, Task> Message;
-
-        static MessageHandler()
-        {
-            Service = new MessageHandler();
-        }
 
         private MessageHandler() { }
 

@@ -4,8 +4,7 @@ using Discord;
 using Discord.Commands;
 using MusicBear.Services;
 
-
-namespace MusicBear.Modules
+namespace MusicBear.CommandModules
 {
     public class MusicModule : ModuleBase<SocketCommandContext>
     {
@@ -46,6 +45,7 @@ namespace MusicBear.Modules
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("skip")]
+        [Alias("s")]
         public async Task SkipAsync()
             => await AudioServices.SkipAsync(Context.Guild, Context.Channel);
 
@@ -80,7 +80,6 @@ namespace MusicBear.Modules
 
         [RequireContext(ContextType.Guild, ErrorMessage = _errMsg)]
         [Command("leave", RunMode = RunMode.Async)]
-        [Alias("l")]
         public async Task LeaveAsync()
             => await AudioServices.LeaveAsync(Context.Guild, Context.Channel);
     }

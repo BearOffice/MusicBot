@@ -28,7 +28,6 @@ namespace MusicBear.Services
         public async Task InitializeAsync() =>
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);  // DI
 
-
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
         {
             if (!(rawMessage is SocketUserMessage message)) return;

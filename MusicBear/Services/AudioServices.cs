@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
@@ -9,7 +8,7 @@ using Discord.Audio;
 using Discord.WebSocket;
 using NAudio.Wave;
 using MusicBear.Core;
-using MusicBear.Assistor;
+using MusicBear.AudioAssistant;
 
 namespace MusicBear.Services
 {
@@ -55,7 +54,7 @@ namespace MusicBear.Services
 
             _container.TryGetValue(guild.Id, out AudioContainer container);
 
-            if (PlaylistInfo.List.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
+            if (Playlist.Info.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
                 await AddListAsync(guild, channel, item, isNext);
             else if (File.Exists(item))
                 await AddSingleAsync(guild, channel, item, isNext);
@@ -89,7 +88,7 @@ namespace MusicBear.Services
         // Add Playlist
         private async Task AddListAsync(IGuild guild, IMessageChannel channel, string playlistName, bool isNext)
         {
-            PlaylistInfo.List.TryGetValue($"{playlistName}.txt", out List<string> paths);
+            Playlist.Info.TryGetValue($"{playlistName}.txt", out var paths);
             _container.TryGetValue(guild.Id, out AudioContainer container);
             var queue = container.QueueManager;
             var ex = 0;        // Count the files' amount that do not exist
@@ -229,6 +228,17 @@ namespace MusicBear.Services
 
         public async Task QRemoveAllAsync(IGuild guild, IMessageChannel channel)
             => await QueueOpAsync(guild, channel, OpType.RemoveAll, hasPos: false);
+
+        private async Task<bool> IsQueueEmpty(IGuild guild, IMessageChannel channel)
+        {
+            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
+            {
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                return true;
+            }
+
+            return false;
+        }
 
         private async Task QueueOpAsync(IGuild guild, IMessageChannel channel, OpType opType, bool hasPos, int pos = 0)
         {

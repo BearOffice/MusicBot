@@ -2,7 +2,7 @@
 using Discord.Audio;
 using NAudio.Wave;
 
-namespace MusicBear.Assistor
+namespace MusicBear.AudioAssistant
 {
     public class AudioContainer
     {

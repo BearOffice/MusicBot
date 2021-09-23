@@ -9,9 +9,9 @@ using MusicBear.Services;
 
 namespace MusicBear.Core
 {
-    public class Main
+    public class EntryPoint
     {
-        public async Task MainAsync()
+        public async Task EntryAsync()
         {
             using var services = ConfigureServices();
 
