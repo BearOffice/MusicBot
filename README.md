@@ -1,7 +1,7 @@
 # MusicBot
 A Discord Music Bot
 
-This MusicBot(MusicBear) is a discord bot coded in C# with Discord.Net.
+This MusicBot(MusicBear) is a discord bot coded in C# with Discord.Net.  
 (Using library [ConfigReadingLib](https://github.com/MisakiBear/ConfigReadingLib))  
 This Bot can send audio to different guilds at the same time.  
 
