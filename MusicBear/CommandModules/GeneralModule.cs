@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using MusicBear.Services;
 using MusicBear.Core;
-using MusicBear.AudioAssistant;
+using MusicBear.AudioAssistants;
 
 namespace MusicBear.CommandModules
 {
@@ -18,7 +19,7 @@ namespace MusicBear.CommandModules
         {
             Config.Game = setgame;
             await Context.Client.SetGameAsync(setgame);
-            await ReplyAsync("<Mention> __Set game succeeded__");
+            await ReplyAsync("<Mention> __Game set.__");
         }
 
         [Command("setstatus")]
@@ -32,10 +33,11 @@ namespace MusicBear.CommandModules
                     "idle" => UserStatus.Idle,
                     "donotdisturb" => UserStatus.DoNotDisturb,
                     "invisible" => UserStatus.Invisible,
-                    _ => throw new Exception("<Mention> __The value is not valid__\n Only 'Online' 'Idle' 'DoNotDisturb' 'Invisible' can be set"),
+                    _ => throw new Exception("<Mention> __The status specified is not valid__\n " +
+                        "Status can be set as 'Online' 'Idle' 'DoNotDisturb' 'Invisible'."),
                 };
                 await Context.Client.SetStatusAsync(userstatus);
-                await ReplyAsync("<Mention> __Set status succeeded__");
+                await ReplyAsync("<Mention> __Status set.__");
             }
             catch(Exception ex)
             {
@@ -44,12 +46,16 @@ namespace MusicBear.CommandModules
         }
 
         [Command("help")]
-        public Task HelpAsync()
-            => ReplyAsync($">>> Help Message ```{Config.HelpText}```");
+        public async Task HelpAsync()
+        {
+            await ReplyAsync($">>> Help Message ```{Config.HelpText}```");
+        }
 
         [Command("ping")]
-        public Task PingAsync()
-            => ReplyAsync($"Current Ping  {Context.Client.Latency}ms");
+        public async Task PingAsync()
+        {
+            await ReplyAsync($"Current Ping  {Context.Client.Latency}ms");
+        }
 
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
@@ -60,14 +66,16 @@ namespace MusicBear.CommandModules
 
         [Command("playlist")]
         [Alias("pl")]
-        public async Task PlaylistAsync()
+        public async Task PlayListAsync()
         {
-            if (Playlist.Info.Count == 0)
-                await ReplyAsync("<Mention> __Playlist is empty__");
+            if (PlayList.Info.Count == 0)
+            {
+                await ReplyAsync("<Mention> __Play list is empty__");
+            }
             else
             {
-                var pl = String.Join(", ", Playlist.Info.Keys.ToArray()).Replace(".txt", ""); // Remove file extension ".txt"
-                await ReplyAsync($">>> Playlists\n```{pl}```");
+                var pl = string.Join(", ", PlayList.Info.Keys.Select(item => item[..^4])); // 4 is the length of .txt
+                await ReplyAsync($">>> PlayLists\n```{pl}```");
             }
         }
 
@@ -77,7 +85,7 @@ namespace MusicBear.CommandModules
         public async Task ExitAsync()
         {
             await AudioServices.LeaveAllAsync();
-            await ReplyAsync("See you next time");
+            await ReplyAsync("<Mention> __See you next time__");
             await Context.Client.StopAsync();
             AppControl.Exit();
         }

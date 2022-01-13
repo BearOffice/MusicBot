@@ -1,8 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Discord.Audio;
 using NAudio.Wave;
 
-namespace MusicBear.AudioAssistant
+namespace MusicBear.AudioAssistants
 {
     public class AudioContainer
     {

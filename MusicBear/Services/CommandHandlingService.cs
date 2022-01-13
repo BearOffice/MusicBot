@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
@@ -25,12 +27,14 @@ namespace MusicBear.Services
             _discord.MessageReceived += MessageReceivedAsync;
         }
 
-        public async Task InitializeAsync() =>
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);  // DI
-
-        public async Task MessageReceivedAsync(SocketMessage rawMessage)
+        public async Task InitializeAsync()
         {
-            if (!(rawMessage is SocketUserMessage message)) return;
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);  // DI
+        }
+
+        private async Task MessageReceivedAsync(SocketMessage rawMessage)
+        {
+            if (rawMessage is not SocketUserMessage message) return;
             if (message.Source != MessageSource.User) return;
 
             var argPos = 0;
@@ -44,7 +48,8 @@ namespace MusicBear.Services
             await _commands.ExecuteAsync(context, argPos, _services);
         }
 
-        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        private async Task CommandExecutedAsync(Optional<CommandInfo> command, 
+            ICommandContext context, IResult result)
         {
             if (!command.IsSpecified) return;
 

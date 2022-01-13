@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
@@ -16,7 +17,7 @@ namespace MusicBear.Core
             using var services = ConfigureServices();
 
             MessageHandler.Service.Message += MessageAsync;
-            MessageHandler.Service.AddMessage("Message", "Initializing");
+            MessageHandler.Service.Add("Message", "Initializing");
 
             var client = services.GetRequiredService<DiscordSocketClient>();
 
@@ -30,7 +31,7 @@ namespace MusicBear.Core
             }
             catch (Exception ex)
             {
-                MessageHandler.Service.AddMessage("Discord", ex.Message);
+                MessageHandler.Service.Add("Discord", ex.Message);
                 AppControl.Exit();
             }
 
@@ -43,7 +44,7 @@ namespace MusicBear.Core
             await Task.Delay(Timeout.Infinite);
         }
 
-        private ServiceProvider ConfigureServices()
+        private static ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
@@ -59,7 +60,7 @@ namespace MusicBear.Core
         private Task MessageAsync(MessageEventArgs msg) =>
             Task.Run(() => MessageWritter(msg.Source, msg.Message));
 
-        private void MessageWritter(string source, string message)
+        private static void MessageWritter(string source, string message)
         {
             var messagenow = string.Format("{0}  {1}", DateTime.Now.ToString("T"), source);
             Console.WriteLine($"{messagenow,-20}{message}");

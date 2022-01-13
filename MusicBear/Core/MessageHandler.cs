@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace MusicBear.Core
 {
@@ -10,18 +12,18 @@ namespace MusicBear.Core
 
         private MessageHandler() { }
 
-        public void AddMessage(string source, string message) => Message?.Invoke(new MessageEventArgs(source, message));
+        public void Add(string source, string message) => Message?.Invoke(new MessageEventArgs(source, message));
     }
 
     public class MessageEventArgs
     {
-        public string Source { get; private set; }
-        public string Message { get; private set; }
+        public string Source { get; }
+        public string Message { get; }
 
         public MessageEventArgs(string source, string message)
         {
-            this.Source = source;
-            this.Message = message;
+            Source = source;
+            Message = message;
         }
     }
 }

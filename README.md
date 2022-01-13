@@ -1,15 +1,16 @@
 # MusicBot
 A Discord Music Bot
 
-This MusicBot(MusicBear) is a discord bot coded in C# with Discord.Net.  
-(Using library [ConfigReadingLib](https://github.com/MisakiBear/ConfigReadingLib))  
-This Bot can send audio to different guilds at the same time.  
+This Music Bot(MusicBear) is a discord bot coded in C# with Discord.Net.  
+(Using library [BearMarkupLanguageLib](https://github.com/MisakiBear/ConfigReadingLib) to read configs.)  
+This bot can send audio to different guilds at the same time.  
+dotnet6.0 is needed.  
 
 # Install
-The folder where this app is located must include "AppConfig.conf", "Help.txt", "libsodium.dll", "opus.dll" and can include a "Playlist" folder to store playlists.   
-Before you launch this app, you should replace "token there" to your bot's token in "AppConfig.conf".  
-
-A playlist must be saved in txt format, and the format of the contents should be like as follows:  
+The folder where this app is located should include config.txt, libsodium.dll, opus.dll and can include a folder named playlist to store playlists.  
+Before launching this app, ">token there<" should be replaced to bot's token in config.txt.  
+  
+A playlist should be saved in txt format, and the format of the contents should be like as follows:  
 C:\Users\User\Music\example.mp3  
 D:\example.flac  
 ...  

@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Concurrent;
 using Discord;
 using Discord.Audio;
 using Discord.WebSocket;
 using NAudio.Wave;
 using MusicBear.Core;
-using MusicBear.AudioAssistant;
+using MusicBear.AudioAssistants;
 
 namespace MusicBear.Services
 {
     public class AudioServices
     {
-        private readonly ConcurrentDictionary<ulong, AudioContainer> _container; // Allow bots to play music in multiple threads
+        // Allow bots to play music in multiple threads
+        private readonly ConcurrentDictionary<ulong, AudioContainer> _container;
         private readonly DiscordSocketClient _discord;
 
         public AudioServices(DiscordSocketClient discord)
@@ -27,7 +28,7 @@ namespace MusicBear.Services
         {
             if (voiceChannel == null)
             {
-                await channel.SendMessageAsync("<Mention> __User must be in a voice channel__");
+                await channel.SendMessageAsync("<Mention> __User must be in the voice channel__");
                 return false;
             }
             var guildId = voiceChannel.Guild.Id;
@@ -52,29 +53,29 @@ namespace MusicBear.Services
                 if (!await JoinAsync(voiceChannel, channel)) return;
             }
 
-            _container.TryGetValue(guild.Id, out AudioContainer container);
+            _container.TryGetValue(guild.Id, out var container);
 
-            if (Playlist.Info.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
+            if (PlayList.Info.TryGetValue($"{item}.txt", out _))   // Check if the item is playlist
                 await AddListAsync(guild, channel, item, isNext);
             else if (File.Exists(item))
                 await AddSingleAsync(guild, channel, item, isNext);
             else
                 await channel.SendMessageAsync($"<Exception> __Cannot find the music file or playlist specified__\n" +
                     $"Check if the music file's path is correct " +
-                    $"or use command {Config.Prefix}playlist to confirm the avaliable playlists");
+                    $"or use command {Config.Prefix}playlist to show the available playlists");
 
             var queue = container.QueueManager;
             if (!queue.IsPlaying)
             {
                 queue.StartPlay();
-                await SendingLoopAsync(guild, channel);
+                await SendingAsync(guild, channel);
             }
         }
 
         // Add single song
         private async Task AddSingleAsync(IGuild guild, IMessageChannel channel, string path, bool isNext)
         {
-            _container.TryGetValue(guild.Id, out AudioContainer container);
+            _container.TryGetValue(guild.Id, out var container);
             var queue = container.QueueManager;
 
             if (isNext)
@@ -85,13 +86,13 @@ namespace MusicBear.Services
             await channel.SendMessageAsync($"`{path} added`");
         }
 
-        // Add Playlist
-        private async Task AddListAsync(IGuild guild, IMessageChannel channel, string playlistName, bool isNext)
+        // Add PlayList
+        private async Task AddListAsync(IGuild guild, IMessageChannel channel, string playListName, bool isNext)
         {
-            Playlist.Info.TryGetValue($"{playlistName}.txt", out var paths);
-            _container.TryGetValue(guild.Id, out AudioContainer container);
+            PlayList.Info.TryGetValue($"{playListName}.txt", out var paths);
+            _container.TryGetValue(guild.Id, out var container);
             var queue = container.QueueManager;
-            var ex = 0;        // Count the files' amount that do not exist
+            var ex = 0;  // Count the files' amount that do not exist
 
             if (isNext)
             {
@@ -113,40 +114,45 @@ namespace MusicBear.Services
 
             if (ex == paths.Count)
             {
-                await channel.SendMessageAsync($"<Exception> __Cannot find any music files specified__\n" +
-                    $"Check out the music files paths");
+                await channel.SendMessageAsync($"<Exception> __Cannot find any music file specified__\n" +
+                    $"Check out if the music files are exist");
                 return;
             }
             else if (ex > 0)
             {
                 await channel.SendMessageAsync($"<Mention> __Some songs({ex}) have been skipped " +
-                    $"because these music files cannot be specified__");
+                    $"since these music files do not exist__");
             }
 
-            await channel.SendMessageAsync($"`{playlistName} added`");
+            await channel.SendMessageAsync($"`{playListName} added`");
         }
 
-        private async Task SendingLoopAsync(IGuild guild, IMessageChannel channel)
+        private async Task SendingAsync(IGuild guild, IMessageChannel channel)
         {
-            _container.TryGetValue(guild.Id, out AudioContainer container);
+            _container.TryGetValue(guild.Id, out var container);
             var queue = container.QueueManager;
+
             while (queue.IsPlaying)
             {
                 await channel.SendMessageAsync($"`Now playing  {queue.NowPlaying}`");
-                if (Config.SonginStatus && _container.Count == 1)  // Prevent collisions when the bot connects to more than one voice channel
+
+                // Prevent collisions when the bot connects to more than one voice channel
+                if (Config.SonginStatus && _container.Count == 1)
                     await _discord.SetGameAsync(queue.NowPlaying);
 
-                await SendAsync(guild, queue.NowPlayingPath);
+                await SendSingleAsync(guild, queue.NowPlayingPath);
 
                 Thread.Sleep(2000);
                 queue.PlayNext();
             }
+
+            // Set back game
             await _discord.SetGameAsync(Config.Game);
         }
 
-        private async Task SendAsync(IGuild guild, string path)
+        private async Task SendSingleAsync(IGuild guild, string path)
         {
-            _container.TryGetValue(guild.Id, out AudioContainer container);
+            _container.TryGetValue(guild.Id, out var container);
             var audioOutStream = container.AudioOutStream;
             var token = container.CancellationTokenSource.Token;
 
@@ -168,7 +174,7 @@ namespace MusicBear.Services
 
         public async Task SkipAsync(IGuild guild, IMessageChannel channel)
         {
-            if (_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (_container.TryGetValue(guild.Id, out var container))
             {
                 container.CancellationTokenSource.Cancel();
                 await channel.SendMessageAsync($"<Mention> __Music skipped__");
@@ -181,7 +187,7 @@ namespace MusicBear.Services
 
         public async Task GetNowPlayingAsync(IGuild guild, IMessageChannel channel)
         {
-            if (_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (_container.TryGetValue(guild.Id, out var container))
             {
                 if (container.QueueManager.IsPlaying && container.ResamplerDmoStream != null)
                 {
@@ -205,7 +211,7 @@ namespace MusicBear.Services
 
         public async Task GetQueueAsync(IGuild guild, IMessageChannel channel)
         {
-            if (_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (_container.TryGetValue(guild.Id, out var container))
             {
                 var contents = container.QueueManager.GetRestQueue();
                 if (contents == "")
@@ -218,72 +224,67 @@ namespace MusicBear.Services
         }
 
         public async Task QMoveToTopAsync(IGuild guild, IMessageChannel channel, int pos)
-            => await QueueOpAsync(guild, channel, OpType.MoveToNext, hasPos: true, pos: pos);
-
-        public async Task QShuffleAsync(IGuild guild, IMessageChannel channel)
-            => await QueueOpAsync(guild, channel, OpType.Shuffle, hasPos: false);
-
-        public async Task QRemoveAsync(IGuild guild, IMessageChannel channel, int pos)
-            => await QueueOpAsync(guild, channel, OpType.Remove, hasPos: true, pos: pos);
-
-        public async Task QRemoveAllAsync(IGuild guild, IMessageChannel channel)
-            => await QueueOpAsync(guild, channel, OpType.RemoveAll, hasPos: false);
-
-        private async Task<bool> IsQueueEmpty(IGuild guild, IMessageChannel channel)
         {
-            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
-            {
-                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
-                return true;
-            }
-
-            return false;
-        }
-
-        private async Task QueueOpAsync(IGuild guild, IMessageChannel channel, OpType opType, bool hasPos, int pos = 0)
-        {
-            if (!_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (!_container.TryGetValue(guild.Id, out var container))
             {
                 await channel.SendMessageAsync($"<Mention> __Queue is empty__");
                 return;
             }
 
-            var isSuccess = opType switch
-            {
-                OpType.MoveToNext => container.QueueManager.MoveToTop(pos),
-                OpType.Shuffle => container.QueueManager.Shuffle(),
-                OpType.Remove => container.QueueManager.Delete(pos),
-                OpType.RemoveAll => container.QueueManager.DeleteAll(),
-                _ => false,
-            };
-
-            if (!isSuccess)
-            {
-                if (hasPos)
-                    await channel.SendMessageAsync($"<Mention> __The operation {opType} failed__");
-                else
-                    await channel.SendMessageAsync($"<Mention> __Queue is empty__");
-            }
+            if (container.QueueManager.MoveToTop(pos))
+                await channel.SendMessageAsync($"<Mention> __Operation successed__");
             else
-            {
-                await channel.SendMessageAsync($"<Mention> __{opType} succeeded__");
-            }
+                await channel.SendMessageAsync($"<Mention> __Failed to move song(at {pos}) to top__");
         }
 
-        private enum OpType
+        public async Task QShuffleAsync(IGuild guild, IMessageChannel channel)
         {
-            MoveToNext,
-            Shuffle,
-            Remove,
-            RemoveAll,
+            if (!_container.TryGetValue(guild.Id, out var container))
+            {
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                return;
+            }
+
+            if (container.QueueManager.Shuffle())
+                await channel.SendMessageAsync($"<Mention> __Operation successed__");
+            else
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+        }
+            
+        public async Task QRemoveAsync(IGuild guild, IMessageChannel channel, int pos)
+        {
+            if (!_container.TryGetValue(guild.Id, out var container))
+            {
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                return;
+            }
+
+            if (container.QueueManager.Remove(pos))
+                await channel.SendMessageAsync($"<Mention> __Operation successed__");
+            else
+                await channel.SendMessageAsync($"<Mention> __Failed to remove song(at {pos})__");
+        }
+
+        public async Task QRemoveAllAsync(IGuild guild, IMessageChannel channel)
+        {
+            if (!_container.TryGetValue(guild.Id, out var container))
+            {
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
+                return;
+            }
+
+            if (container.QueueManager.RemoveAll())
+                await channel.SendMessageAsync($"<Mention> __Operation successed__");
+            else
+                await channel.SendMessageAsync($"<Mention> __Queue is empty__");
         }
 
         public async Task StopAsync(IGuild guild, IMessageChannel channel)
         {
-            if (_container.TryGetValue(guild.Id, out AudioContainer container))
+            if (_container.TryGetValue(guild.Id, out var container))
             {
                 container.CancellationTokenSource.Cancel();
-                container.QueueManager.DeleteAll();
+                container.QueueManager.RemoveAll();
                 await channel.SendMessageAsync($"<Mention> __Music stopped__");
             }
             else
@@ -294,12 +295,12 @@ namespace MusicBear.Services
 
         public async Task LeaveAsync(IGuild guild, IMessageChannel channel)
         {
-            if (!_container.TryRemove(guild.Id, out AudioContainer container))
+            if (!_container.TryRemove(guild.Id, out var container))
             {
                 await channel.SendMessageAsync($"<Mention> __Bot has not joined to audio channel yet__");
                 return;
             }
-            await channel.SendMessageAsync($"<Mention> __Bot disconnected from audio channel__");
+            await channel.SendMessageAsync($"<Mention> __Disconnected from audio channel__");
             await container.AudioClient.StopAsync();
         }
 
@@ -309,6 +310,7 @@ namespace MusicBear.Services
             {
                 await item.Value.AudioClient.StopAsync();
             }
+            _container.Clear();
         }
     }
 }

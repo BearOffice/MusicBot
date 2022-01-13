@@ -3,23 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace MusicBear.AudioAssistant
+namespace MusicBear.AudioAssistants
 {
     public class QueueManager
     {
-        private readonly List<string> _playlist = new List<string>();  // Contains music files' paths
-        public bool IsPlaying { get => !(NowPlayingPath == ""); }
-        public int RemainingNumber { get => _playlist.Count(); }
-        public string NowPlayingPath { get; private set; } = "";
-        public string NowPlaying { get; private set; } = "";
-        public bool HasRest
-        {
-            get
-            {
-                if (_playlist.Count > 0) return true;
-                return false;
-            }
-        }
+        private readonly List<string> _playlist = new();  // Contains music files' paths
+        public bool IsPlaying { get => !string.IsNullOrEmpty(NowPlayingPath); }
+        public int RemainingNumber { get => _playlist.Count; }
+        public string NowPlayingPath { get; private set; } = string.Empty;
+        public string NowPlaying { get; private set; } = string.Empty;
+        public bool HasRest { get => _playlist.Count > 0; }
 
         public void Add(string name)
         {
@@ -45,7 +38,7 @@ namespace MusicBear.AudioAssistant
         public bool Shuffle()
         {
             if (!HasRest) return false;
-            for (int i = 0; i < _playlist.Count; i++)  //Linq cannot be used because _playlist is readonly
+            for (int i = 0; i < _playlist.Count; i++)
             {
                 string temp = _playlist[i];
                 int random = new Random().Next(0, _playlist.Count);
@@ -55,14 +48,14 @@ namespace MusicBear.AudioAssistant
             return true;
         }
 
-        public bool Delete(int pos)
+        public bool Remove(int pos)
         {
             if (!IsValid(pos)) return false;
             _playlist.RemoveAt(pos);
             return true;
         }
 
-        public bool DeleteAll()
+        public bool RemoveAll()
         {
             if (!HasRest) return false;
             _playlist.Clear();
@@ -78,22 +71,21 @@ namespace MusicBear.AudioAssistant
                 NowPlaying = GetTitle(playitem);
                 _playlist.RemoveAt(0);
             }
-            else if (NowPlayingPath != "")
+            else if (!string.IsNullOrEmpty(NowPlayingPath))
             {
-                NowPlayingPath = "";
-                NowPlaying = "";
+                NowPlayingPath = string.Empty;
+                NowPlaying = string.Empty;
             }
         }
 
         public void StartPlay()
         {
-            if (NowPlayingPath == "")
-                PlayNext();
+            if (string.IsNullOrEmpty(NowPlayingPath)) PlayNext();
         }
 
         public string GetRestQueue()
         {
-            var queue = "";
+            var queue = string.Empty;
             if (HasRest)
             {
                 for (int i = 0; i < _playlist.Count; i++)
@@ -111,15 +103,14 @@ namespace MusicBear.AudioAssistant
 
         private bool IsValid(int pos)
         {
-            if (0 <= pos && pos < _playlist.Count) return true;
-            return false;
+            return 0 <= pos && pos < _playlist.Count;
         }
 
-        private string GetTitle(string path)
+        private static string GetTitle(string path)
         {
             var tagfile = TagLib.File.Create(path);   // Get audio file's title
             var title = tagfile.Tag.Title;
-            if (title == "" || title == null)
+            if (string.IsNullOrEmpty(title))
                 title = Path.GetFileName(path);
             return title;
         }

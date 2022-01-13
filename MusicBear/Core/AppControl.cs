@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MusicBear.Core
 {
@@ -7,9 +10,9 @@ namespace MusicBear.Core
     {
         public static void Exit()
         {
-            Thread.Sleep(1000);
-            MessageHandler.Service.AddMessage("Message", "This application will be closed automatically in 15sec");
-            Thread.Sleep(15000);
+            Task.Delay(1000).Wait();
+            MessageHandler.Service.Add("Message", "This application will be closed automatically in 15sec.");
+            Task.Delay(15000).Wait();
             Environment.Exit(0);
         }
     }

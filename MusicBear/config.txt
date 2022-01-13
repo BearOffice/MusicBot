@@ -1,0 +1,28 @@
+﻿token: >token here<
+prefix: -
+game: type "-help" to get help
+# value: Online / Idle / DoNotDisturb / Invisible
+status: Online 
+# value: True / False
+songinstatus: True
+help: |
+  -help   show the help message
+  -ping   check the bot's latency
+  -userinfo   show the user's info
+  -setgame [game]   set the bot's game
+  -setstatus [status]   set the bot's status
+  -playlist(pl)   show the available playlists
+  -shutdown(exit/disconnect)   shut down the bot
+  
+  -join(j)   connect the bot to voice channel
+  -play(p) [path/playlist]   play the provided song or playlist
+  -playnext(pn) [path/playlist]   play the provided song or playlist next
+  -movetonext(mn) [position]   move this song to the top of the queue
+  -nowplaying(np)   show the current song
+  -skip(s)   skip the current song
+  -queue(q)   show the current queue
+  -shuffle(sf)   shuffle songs in the queue
+  -remove(rm) [position]   remove a song from the queue
+  -removeall(rma)   remove all songs from the queue
+  -stop   stop the current song and clear the queue   
+  -leave   disconnect the bot from voice channel

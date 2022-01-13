@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30225.117
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicBear", "MusicBear\MusicBear.csproj", "{87A14BF2-A8E2-4925-A0BE-FEB70DA86469}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicBear", "MusicBear\MusicBear.csproj", "{D9BA52EB-1CBE-4703-B872-24E56A540949}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{87A14BF2-A8E2-4925-A0BE-FEB70DA86469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87A14BF2-A8E2-4925-A0BE-FEB70DA86469}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87A14BF2-A8E2-4925-A0BE-FEB70DA86469}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87A14BF2-A8E2-4925-A0BE-FEB70DA86469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9BA52EB-1CBE-4703-B872-24E56A540949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9BA52EB-1CBE-4703-B872-24E56A540949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9BA52EB-1CBE-4703-B872-24E56A540949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9BA52EB-1CBE-4703-B872-24E56A540949}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {DB439016-BA96-46C3-86DB-790232070C50}
+		SolutionGuid = {F3C230C4-D768-45C6-9148-E66AF475E9D0}
 	EndGlobalSection
 EndGlobal
